@@ -1,4 +1,4 @@
-const CACHE = 'wake-up-v1';
+const CACHE = 'wake-up-v2';
 const ASSETS = ['.', 'index.html', 'manifest.json', 'icon.svg'];
 
 self.addEventListener('install', e => {
