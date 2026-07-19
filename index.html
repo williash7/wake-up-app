@@ -440,7 +440,7 @@ async function sendNtfy(state, sleep, tGoal) {
         topic: NTFY_TOPIC,
         title: 'לך לישון! 🌙',
         message: `הגיע הזמן ללכת לישון כדי לקום מחר ב-${tmrwGoal} ✨`,
-        at: String(atTs),
+        delay: String(atTs),
         priority: 4,
         tags: ['sleeping','moon'],
       }),
