@@ -254,6 +254,7 @@ const STEP_DAYS = 3;
 const SLEEP_H = 6;
 const NTFY_TOPIC = 'asher-boker-8x92k';
 const NTFY_URL = 'https://ntfy.sh';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyhWhFb8XvdQ1W74pQQJAQPsYQLYRs74I0N4jNFFBCxFVIoH_B0WcA0kA2MbXsRPLg/exec';
 
 const CHEERS = [
   'כל יום שאתה מתמיד בונה אותך מחדש! 💪',
@@ -360,6 +361,38 @@ const streakIcon = n => n===0?'💤':n<3?'🌱':n<7?'🔥':n<14?'⚡':n<30?'🚀
 const streakLabel = n => n===0?'בוא נתחיל היום!':n===1?'יום ראשון — כל הכבוד!':n===2?'יומיים — מצוין!':n<7?`${n} ימים — ממשיך חזק!`:`${n} ימים רצופים! 🎉`;
 
 // ============================================================
+// GOOGLE SHEETS SYNC
+// ============================================================
+
+// מחזיר { status:'ok', hasData, data } או { status:'error' }
+async function loadFromSheets() {
+  try {
+    const res = await fetch(SHEETS_URL, { redirect: 'follow' });
+    if (!res.ok) return { status: 'error' };
+    const data = await res.json();
+    if (!data.ok) return { status: 'error' };
+    return { status: 'ok', hasData: !!data.startDate, data };
+  } catch(e) { return { status: 'error' }; }
+}
+
+// שולח state שלם ל-Sheets (ברקע, ללא Content-Type כדי להימנע מ-CORS preflight)
+function saveToSheets(state) {
+  if (!state) return;
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    body: JSON.stringify({ startDate: state.startDate, startGoal: state.startGoal, logs: state.logs || [] }),
+  }).catch(() => {});
+}
+
+// ממזג שתי רשימות לוגים — מנצח לפי תאריך, remote גובר על conflict
+function mergeLogs(local, remote) {
+  const map = new Map();
+  (local  || []).forEach(l => map.set(l.date, l));
+  (remote || []).forEach(l => map.set(l.date, l));
+  return Array.from(map.values()).sort((a, b) => a.date < b.date ? -1 : 1);
+}
+
+// ============================================================
 // TOAST
 // ============================================================
 let _tt;
@@ -375,7 +408,9 @@ function toast(msg) {
 function startApp() {
   const val=document.getElementById('sg').value;
   if (!val) { toast('נא להזין שעה 🕐'); return; }
-  save({startDate:today(),startGoal:val,logs:[]});
+  const state={startDate:today(),startGoal:val,logs:[]};
+  save(state);
+  saveToSheets(state);
   render();
 }
 
@@ -391,6 +426,7 @@ async function logWake() {
   const met=toMin(val)<=toMin(g);
   toast(met?'✅ כל הכבוד! עמדת ביעד!':'💪 ניסיון טוב! מחר תצליח יותר!');
   render();
+  saveToSheets(load());
 
   // שלח תזכורת ntfy אוטומטית לשינה הלילה
   const sleep=sleepFor(g);
@@ -403,6 +439,7 @@ function editToday() {
   const state=load();
   state.logs=state.logs.filter(l=>l.date!==today());
   save(state);
+  saveToSheets(state);
   render();
 }
 
@@ -637,9 +674,44 @@ function renderMain() {
 }
 
 // ============================================================
-// INIT
+// INIT — טוען מקומי מיד, מסנכרן עם Sheets ברקע
 // ============================================================
-render();
+async function init() {
+  render(); // הצג מיד נתונים מקומיים
+
+  const result = await loadFromSheets();
+  if (result.status === 'error') return; // אין חיבור — עובד offline
+
+  const local = load();
+
+  if (!result.hasData) {
+    // Sheets ריק — מיגרציה: העלה נתונים מקומיים קיימים פעם אחת
+    if (local) {
+      saveToSheets(local);
+      toast('☁️ נתונים קיימים הועלו לגיליון Google Sheets');
+    }
+    return;
+  }
+
+  // Sheets מכיל נתונים — מזג עם נתונים מקומיים
+  const remote = result.data;
+  if (!local) {
+    // אין נתונים מקומיים — שחזר מ-Sheets
+    save({ startDate: remote.startDate, startGoal: remote.startGoal, logs: remote.logs || [] });
+  } else {
+    // שניהם קיימים — מזג לוגים, Sheets גובר על conflict
+    const merged = {
+      ...local,
+      startDate: remote.startDate || local.startDate,
+      startGoal: remote.startGoal || local.startGoal,
+      logs: mergeLogs(local.logs, remote.logs),
+    };
+    save(merged);
+  }
+  render(); // רנדר מחדש עם נתונים מסונכרנים
+}
+
+init();
 </script>
 </body>
 </html>
