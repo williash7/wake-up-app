@@ -252,7 +252,8 @@ const FINAL = '04:30';
 const STEP_MIN = 15;
 const STEP_DAYS = 3;
 const SLEEP_H = 6;
-const NTFY_URL = 'https://ntfy.sh/asher-boker-8x92k';
+const NTFY_TOPIC = 'asher-boker-8x92k';
+const NTFY_URL = 'https://ntfy.sh';
 
 const CHEERS = [
   'כל יום שאתה מתמיד בונה אותך מחדש! 💪',
@@ -434,14 +435,15 @@ async function sendNtfy(state, sleep, tGoal) {
   try {
     const res=await fetch(NTFY_URL,{
       method:'POST',
-      headers:{
-        'At': String(atTs),
-        'Title': 'לך לישון! 🌙',
-        'Tags': 'sleeping,moon',
-        'Priority': 'high',
-        'Content-Type': 'text/plain; charset=utf-8',
-      },
-      body:`הגיע הזמן ללכת לישון כדי לקום מחר ב-${tmrwGoal} ✨`,
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        topic: NTFY_TOPIC,
+        title: 'לך לישון! 🌙',
+        message: `הגיע הזמן ללכת לישון כדי לקום מחר ב-${tmrwGoal} ✨`,
+        at: String(atTs),
+        priority: 4,
+        tags: ['sleeping','moon'],
+      }),
     });
     if (!res.ok) throw new Error('שגיאת שרת ' + res.status);
     state.lastNtfy={ date:today(), sleepTime:sleep };
