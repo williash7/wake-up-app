@@ -1,4 +1,4 @@
-const CACHE = 'wake-up-v3';
+const CACHE = 'wake-up-v4';
 const ASSETS = ['.', 'index.html', 'manifest.json', 'icon.svg'];
 
 self.addEventListener('install', e => {
@@ -15,8 +15,15 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// Network first: always try to get fresh content, fall back to cache when offline
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request)
+      .then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
