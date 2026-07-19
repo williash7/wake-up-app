@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="קום מוקדם">
+  <meta name="theme-color" content="#FF6B35">
+  <title>קום מוקדם ☀️</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #FF6B35;
+      --orange-lt: #FF8C42;
+      --purple: #6C63FF;
+      --green: #2ECC71;
+      --red: #E53E3E;
+      --bg: #FFF5EF;
+      --card: #FFFFFF;
+      --text: #2D3748;
+      --muted: #A0AEC0;
+      --border: #EDF2F7;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== SETUP ===== */
+    .setup {
+      background: linear-gradient(160deg, #FF8C42 0%, #FF6B35 55%, #E8563A 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+      color: white;
+      text-align: center;
+    }
+    .setup-sun { font-size: 80px; margin-bottom: 18px; animation: bob 3s ease-in-out infinite; }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .setup h1 { font-size: 38px; font-weight: 800; margin-bottom: 10px; }
+    .setup-sub { font-size: 17px; opacity: 0.9; line-height: 1.65; margin-bottom: 36px; }
+    .setup-box {
+      background: white;
+      border-radius: 28px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 380px;
+      color: var(--text);
+      text-align: right;
+    }
+    .setup-q { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .setup-hint { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
+
+    /* ===== MAIN ===== */
+    .app { max-width: 440px; margin: 0 auto; padding-bottom: 48px; }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(160deg, #FF8C42 0%, #FF6B35 60%, #E8563A 100%);
+      padding: 20px 20px 32px;
+      color: white;
+      text-align: center;
+      border-radius: 0 0 36px 36px;
+      box-shadow: 0 8px 32px rgba(255,107,53,0.3);
+    }
+    .hero-date { font-size: 14px; opacity: 0.85; margin-bottom: 4px; }
+    .hero-title { font-size: 18px; font-weight: 700; opacity: 0.9; margin-bottom: 12px; }
+    .hero-label { font-size: 14px; opacity: 0.8; margin-bottom: 2px; }
+    .hero-time { font-size: 78px; font-weight: 800; letter-spacing: -3px; line-height: 1; }
+    .hero-sleep {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.22); backdrop-filter: blur(4px);
+      border-radius: 99px; padding: 7px 18px; margin-top: 14px;
+      font-size: 15px;
+    }
+    .hero-sleep-time { font-size: 21px; font-weight: 800; }
+
+    /* ===== CONTENT ===== */
+    .content { padding: 16px; }
+
+    /* ===== CARD ===== */
+    .card {
+      background: white;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: var(--muted);
+      margin-bottom: 15px;
+    }
+
+    /* ===== INPUTS & BUTTONS ===== */
+    input[type="time"] {
+      flex: 1;
+      padding: 13px 12px;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text);
+      background: #F7FAFC;
+      direction: ltr;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none;
+    }
+    input[type="time"]:focus { border-color: var(--orange); background: white; }
+
+    .btn {
+      padding: 13px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s, opacity 0.15s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.95); opacity: 0.82; }
+    .btn-primary { background: linear-gradient(135deg, var(--orange-lt), var(--orange)); color: white; }
+    .btn-full { width: 100%; }
+    .btn-lg { padding: 17px; font-size: 18px; border-radius: 16px; margin-top: 4px; }
+    .btn-ghost { background: #F0F4F8; color: #718096; font-size: 14px; padding: 11px 16px; }
+
+    /* ===== LOG SECTION ===== */
+    .log-row { display: flex; gap: 10px; align-items: stretch; }
+    .log-row input[type="time"] { font-size: 22px; padding: 13px 8px; }
+    .log-row .btn { flex-shrink: 0; }
+
+    .logged-banner {
+      border-radius: 14px; padding: 14px 16px;
+      font-weight: 600; font-size: 15px; margin-bottom: 10px; line-height: 1.4;
+    }
+    .banner-ok { background: #F0FFF4; color: #22543D; }
+    .banner-miss { background: #FFF5F5; color: #742A2A; }
+
+    /* ===== EVENING BANNER ===== */
+    .evening {
+      background: linear-gradient(135deg, #4c3d8f, #6C63FF);
+      color: white; border-radius: 18px; padding: 16px 18px;
+      margin-bottom: 14px; line-height: 1.5;
+    }
+    .evening-label { font-size: 14px; opacity: 0.85; }
+    .evening-time { font-size: 34px; font-weight: 800; margin: 4px 0; }
+    .evening-sub { font-size: 13px; opacity: 0.85; }
+
+    /* ===== NOTIF ===== */
+    .notif-row { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 12px; }
+    .ntfy-status {
+      border-radius: 12px; padding: 10px 14px; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .ntfy-sent  { background: #F0FFF4; color: #276749; }
+    .ntfy-info  { background: #F0F0FF; color: #553C9A; }
+    .ntfy-error { background: #FFF5F5; color: #742A2A; }
+    .ntfy-status button {
+      background: var(--orange); color: white; border: none;
+      border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ===== STREAK ===== */
+    .streak-row { display: flex; align-items: center; gap: 14px; }
+    .streak-num { font-size: 72px; font-weight: 800; color: var(--orange); line-height: 1; flex-shrink: 0; }
+    .streak-icon { font-size: 48px; flex-shrink: 0; }
+    .streak-label { font-size: 18px; font-weight: 700; }
+    .streak-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .cheer {
+      margin-top: 14px; font-size: 14px; color: #4A5568;
+      background: #FFFBF0; border-radius: 12px; padding: 11px 14px; line-height: 1.55;
+      border-right: 3px solid #FFD700;
+    }
+
+    /* ===== PROGRESS ===== */
+    .prog-bar-wrap { height: 14px; background: #EDF2F7; border-radius: 99px; overflow: hidden; margin: 12px 0 8px; }
+    .prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--orange-lt), var(--orange)); border-radius: 99px; transition: width 0.7s ease; }
+    .prog-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+    .prog-note { font-size: 13px; color: #4A5568; margin-top: 10px; line-height: 1.5; }
+    .reached { text-align: center; padding: 12px 0; }
+    .reached-big { font-size: 52px; }
+    .reached-text { font-size: 19px; font-weight: 700; color: var(--orange); margin-top: 6px; }
+
+    /* ===== HISTORY ===== */
+    .hist-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px;
+    }
+    .hist-row:last-child { border-bottom: none; }
+    .hist-date { color: var(--muted); font-size: 13px; }
+    .hist-time { font-weight: 700; }
+    .hist-goal { font-size: 12px; color: var(--muted); text-align: center; }
+    .hist-status { font-size: 20px; min-width: 26px; text-align: center; }
+
+    /* ===== INSTALL ===== */
+    .install-wrap { text-align: center; margin-bottom: 14px; display: none; }
+    .install-wrap.show { display: block; }
+    .install-btn {
+      background: white; color: var(--orange);
+      border: 2px solid var(--orange); border-radius: 14px;
+      padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+
+    /* ===== RESET ===== */
+    .reset-row { text-align: center; padding-top: 8px; }
+    .reset-btn {
+      background: none; border: none; color: #CBD5E0;
+      font-size: 12px; cursor: pointer; padding: 8px 16px;
+    }
+    .reset-btn:hover { color: var(--muted); }
+
+    /* ===== TOAST ===== */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(26,32,44,0.93); color: white;
+      padding: 12px 26px; border-radius: 99px; font-size: 14px; font-weight: 600;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 999; pointer-events: none; white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// CONSTANTS
+// ============================================================
+const KEY = 'wakeUp_v3';
+const FINAL = '04:30';
+const STEP_MIN = 15;
+const STEP_DAYS = 3;
+const SLEEP_H = 6;
+const NTFY_URL = 'https://ntfy.sh/asher-boker-8x92k';
+
+const CHEERS = [
+  'כל יום שאתה מתמיד בונה אותך מחדש! 💪',
+  'בוקר מוקדם = הבוקר שלך, לפני שהעולם מתעורר ☀️',
+  'ההרגל הוא הכוח הגדול ביותר — אתה בונה אותו עכשיו! 🔥',
+  'כל קימה מוקדמת היא ניצחון על עצמך 🏆',
+  'אתה מוכיח לעצמך שאתה יכול. המשך כך! ⚡',
+  'הבוקרים המוקדמים שייכים לאלה שחולמים על גדולות 🌅',
+  'רצף של הרגלים טובים = חיים טובים יותר 🌟',
+  'שקט הבוקר שווה הכל — אתה שם! 🧘',
+  'כל הגדולים קמים מוקדם. אתה בדרך הנכונה 🚀',
+  'עשה את זה מספיק פעמים — וזה יהפוך לחלק ממך 🌊',
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; } };
+const save = s => localStorage.setItem(KEY, JSON.stringify(s));
+
+// ============================================================
+// TIME HELPERS
+// ============================================================
+const toMin = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+const fromMin = m => {
+  const v = ((m % 1440) + 1440) % 1440;
+  return `${String(Math.floor(v/60)).padStart(2,'0')}:${String(v%60).padStart(2,'0')}`;
+};
+const today = () => new Date().toLocaleDateString('en-CA');
+const nowTime = () => { const n=new Date(); return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`; };
+const dateMs = d => new Date(d+'T12:00:00').getTime();
+const daysDiff = (a,b) => Math.round((dateMs(b)-dateMs(a))/86400000);
+const isEvening = () => { const h=new Date().getHours(); return h>=18||h<2; };
+
+const fmtDate = d => {
+  try { return new Date(d+'T12:00:00').toLocaleDateString('he-IL',{weekday:'short',day:'numeric',month:'short'}); }
+  catch { return d; }
+};
+
+// ============================================================
+// CORE LOGIC
+// ============================================================
+function goalForDate(state, date) {
+  const startMin = toMin(state.startGoal);
+  const finalMin = toMin(FINAL);
+  if (startMin <= finalMin) return state.startGoal;
+  const days = daysDiff(state.startDate, date);
+  if (days < 0) return state.startGoal;
+  const steps = Math.floor(days / STEP_DAYS);
+  return fromMin(Math.max(finalMin, startMin - steps * STEP_MIN));
+}
+
+const sleepFor = wakeGoal => fromMin(toMin(wakeGoal) - SLEEP_H * 60);
+
+function calcStreak(state) {
+  const t = today();
+  const hasToday = state.logs.some(l => l.date === t);
+  const d = new Date(t+'T12:00:00');
+  if (!hasToday) d.setDate(d.getDate()-1);
+  let streak = 0;
+  for (let i=0; i<365; i++) {
+    const ds = d.toLocaleDateString('en-CA');
+    const log = state.logs.find(l=>l.date===ds);
+    const goal = goalForDate(state, ds);
+    if (!log || toMin(log.wakeTime) > toMin(goal)) break;
+    streak++;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+function progressPct(state) {
+  const s=toMin(state.startGoal), f=toMin(FINAL);
+  if (s<=f) return 100;
+  const cur=toMin(goalForDate(state,today()));
+  return Math.min(100,Math.max(0,Math.round(((s-cur)/(s-f))*100)));
+}
+
+function stepsLeft(state) {
+  const cur=toMin(goalForDate(state,today())), fin=toMin(FINAL);
+  return cur<=fin ? 0 : Math.ceil((cur-fin)/STEP_MIN);
+}
+
+function daysToNext(state) {
+  const days = daysDiff(state.startDate, today());
+  const rem = days % STEP_DAYS;
+  return rem===0 ? STEP_DAYS : STEP_DAYS-rem;
+}
+
+function next7(state) {
+  return Array.from({length:7},(_,i)=>{
+    const d=new Date(today()+'T12:00:00');
+    d.setDate(d.getDate()-i);
+    const ds=d.toLocaleDateString('en-CA');
+    const log=state.logs.find(l=>l.date===ds);
+    const goal=goalForDate(state,ds);
+    let status = i===0 ? '⏳' : '⚪';
+    if (log) status = toMin(log.wakeTime)<=toMin(goal)?'✅':'❌';
+    return {date:ds,log,goal,status};
+  });
+}
+
+const streakIcon = n => n===0?'💤':n<3?'🌱':n<7?'🔥':n<14?'⚡':n<30?'🚀':'👑';
+const streakLabel = n => n===0?'בוא נתחיל היום!':n===1?'יום ראשון — כל הכבוד!':n===2?'יומיים — מצוין!':n<7?`${n} ימים — ממשיך חזק!`:`${n} ימים רצופים! 🎉`;
+
+// ============================================================
+// TOAST
+// ============================================================
+let _tt;
+function toast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function startApp() {
+  const val=document.getElementById('sg').value;
+  if (!val) { toast('נא להזין שעה 🕐'); return; }
+  save({startDate:today(),startGoal:val,logs:[]});
+  render();
+}
+
+async function logWake() {
+  const val=document.getElementById('wi').value;
+  if (!val) { toast('נא להזין שעה'); return; }
+  const state=load();
+  const t=today();
+  state.logs=state.logs.filter(l=>l.date!==t);
+  state.logs.push({date:t,wakeTime:val});
+  save(state);
+  const g=goalForDate(state,t);
+  const met=toMin(val)<=toMin(g);
+  toast(met?'✅ כל הכבוד! עמדת ביעד!':'💪 ניסיון טוב! מחר תצליח יותר!');
+  render();
+
+  // שלח תזכורת ntfy אוטומטית לשינה הלילה
+  const sleep=sleepFor(g);
+  const result=await sendNtfy(load(), sleep, g);
+  if (result.ok) render(); // עדכן UI לסטטוס "נשלח"
+  else if (!result.skipped) toast('⚠️ שגיאה בשליחת תזכורת ntfy');
+}
+
+function editToday() {
+  const state=load();
+  state.logs=state.logs.filter(l=>l.date!==today());
+  save(state);
+  render();
+}
+
+function resetApp() {
+  if (confirm('למחוק את כל הנתונים ולהתחיל מחדש?')) {
+    localStorage.removeItem(KEY);
+    render();
+  }
+}
+
+// שולח תזכורת מתוזמנת דרך ntfy.sh
+// מונע כפילויות: לא שולח אם כבר נשלח היום לאותה שעת שינה
+async function sendNtfy(state, sleep, tGoal) {
+  if (state.lastNtfy && state.lastNtfy.date===today() && state.lastNtfy.sleepTime===sleep) {
+    return { skipped: true };
+  }
+
+  // חשב Unix timestamp לשעת השינה הלילה
+  const [h,m]=sleep.split(':').map(Number);
+  const target=new Date();
+  target.setHours(h,m,0,0);
+  if (target.getTime()<=Date.now()) target.setDate(target.getDate()+1);
+  const atTs=Math.floor(target.getTime()/1000);
+
+  // חשב יעד קימה למחר לגוף ההודעה
+  const tmrw=new Date(today()+'T12:00:00');
+  tmrw.setDate(tmrw.getDate()+1);
+  const tmrwGoal=goalForDate(state, tmrw.toLocaleDateString('en-CA'));
+
+  try {
+    const res=await fetch(NTFY_URL,{
+      method:'POST',
+      headers:{
+        'At': String(atTs),
+        'Title': 'לך לישון! 🌙',
+        'Tags': 'sleeping,moon',
+        'Priority': 'high',
+        'Content-Type': 'text/plain; charset=utf-8',
+      },
+      body:`הגיע הזמן ללכת לישון כדי לקום מחר ב-${tmrwGoal} ✨`,
+    });
+    if (!res.ok) throw new Error('שגיאת שרת ' + res.status);
+    state.lastNtfy={ date:today(), sleepTime:sleep };
+    save(state);
+    return { ok:true };
+  } catch(e) {
+    return { ok:false, err:e.message };
+  }
+}
+
+async function manualNtfy(sleep, tGoal) {
+  const state=load();
+  // מאפשר שליחה ידנית גם אם נשלח כבר (המשתמש ביקש במפורש)
+  delete state.lastNtfy;
+  save(state);
+  render();
+  const result=await sendNtfy(load(), sleep, tGoal);
+  if (result.ok) { toast('🔔 תזכורת נשלחה ל-'+sleep+'!'); render(); }
+  else toast('⚠️ שגיאה: '+result.err);
+}
+
+// ============================================================
+// PWA INSTALL
+// ============================================================
+let _installEvt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); _installEvt=e;
+  const w=document.getElementById('installWrap');
+  if (w) w.classList.add('show');
+});
+function doInstall() {
+  if (!_installEvt) return;
+  _installEvt.prompt();
+  _installEvt.userChoice.then(()=>{_installEvt=null;});
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  document.getElementById('root').innerHTML = load() ? renderMain() : renderSetup();
+}
+
+function renderSetup() {
+  return `
+  <div class="setup">
+    <div class="setup-sun">☀️</div>
+    <h1>קום מוקדם</h1>
+    <p class="setup-sub">אפליקציה שתעזור לך להתעורר מוקדם<br>יותר — בהדרגה, ובלי לחץ</p>
+    <div class="setup-box">
+      <p class="setup-q">מה שעת הקימה הרגילה שלך כרגע?</p>
+      <input type="time" id="sg" value="07:00">
+      <p class="setup-hint" style="margin-top:10px">נתחיל מכאן ונקדים 15 דקות כל 3 ימים עד שנגיע ל-4:30. אפשר לשנות בכל עת.</p>
+      <button class="btn btn-primary btn-full btn-lg" onclick="startApp()">בואו נתחיל! 🚀</button>
+    </div>
+  </div>`;
+}
+
+function renderMain() {
+  const state=load();
+  const t=today();
+  const tGoal=goalForDate(state,t);
+  const sleep=sleepFor(tGoal);
+  const streak=calcStreak(state);
+  const todayLog=state.logs.find(l=>l.date===t);
+  const pct=progressPct(state);
+  const steps=stepsLeft(state);
+  const dNext=daysToNext(state);
+  const reached=steps===0;
+  const history=next7(state);
+  const met=todayLog ? toMin(todayLog.wakeTime)<=toMin(tGoal) : null;
+  const cheer=CHEERS[(streak + new Date().getDate()+new Date().getMonth())%CHEERS.length];
+  const ntfySent=state.lastNtfy && state.lastNtfy.date===t && state.lastNtfy.sleepTime===sleep;
+
+  const eveningHtml = isEvening()&&!todayLog ? `
+    <div class="evening">
+      <div class="evening-label">🌙 ערב טוב! הגיע הזמן להתכונן לשינה</div>
+      <div class="evening-time">${sleep}</div>
+      <div class="evening-sub">לכי/לך לישון עכשיו כדי לקום מחר ב-${tGoal} ✨</div>
+    </div>` : '';
+
+  const logSection = todayLog ? `
+    <div class="logged-banner ${met?'banner-ok':'banner-miss'}">
+      ${met
+        ? `✅ קמת ב-${todayLog.wakeTime} — עמדת ביעד! כל הכבוד!`
+        : `⏰ קמת ב-${todayLog.wakeTime} — לא נורא, מחר תצליח יותר!`}
+    </div>
+    <button class="btn btn-ghost btn-full" onclick="editToday()">עדכן שעה אחרת</button>` : `
+    <div class="log-row">
+      <input type="time" id="wi" value="${nowTime()}">
+      <button class="btn btn-primary" onclick="logWake()">תעד ✓</button>
+    </div>`;
+
+  const progressHtml = reached ? `
+    <div class="reached">
+      <div class="reached-big">🏆</div>
+      <div class="reached-text">הגעת ליעד הסופי — 4:30! מדהים!</div>
+    </div>` : `
+    <div class="prog-bar-wrap">
+      <div class="prog-bar-fill" style="width:${pct}%"></div>
+    </div>
+    <div class="prog-meta">
+      <span>${state.startGoal}</span>
+      <span style="font-weight:700;color:#4A5568">${pct}%</span>
+      <span>04:30</span>
+    </div>
+    <div class="prog-note">
+      עוד ${steps} צעד${steps!==1?'ים':''} × 15 דקות = עוד ${steps*15} דקות לסיום<br>
+      <span style="color:var(--orange);font-weight:600">השלב הבא בעוד ${dNext} יום${dNext!==1?'ים':''}</span> — היעד יהיה ${fromMin(toMin(tGoal)-STEP_MIN)}
+    </div>`;
+
+  return `
+  <div class="app">
+    <div class="hero">
+      <div class="hero-date">${fmtDate(t)}</div>
+      <div class="hero-title">☀️ קום מוקדם</div>
+      <div class="hero-label">יעד הקימה שלך היום</div>
+      <div class="hero-time">${tGoal}</div>
+      <div class="hero-sleep">
+        <span>🌙 לך לישון ב-</span>
+        <span class="hero-sleep-time">${sleep}</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="install-wrap" id="installWrap">
+        <button class="install-btn" onclick="doInstall()">📱 הוסף למסך הבית</button>
+      </div>
+
+      ${eveningHtml}
+
+      <div class="card">
+        <div class="card-title">תיעוד קימה — היום</div>
+        ${logSection}
+        <div class="notif-row">
+          ${ntfySent ? `
+            <div class="ntfy-status ntfy-sent">
+              <span>✅ תזכורת ntfy נשלחה — תגיע ב-${sleep} הלילה</span>
+              <button onclick="manualNtfy('${sleep}','${tGoal}')">שלח שוב</button>
+            </div>` : todayLog ? `
+            <div class="ntfy-status ntfy-error">
+              <span>⚠️ תזכורת לא נשלחה</span>
+              <button onclick="manualNtfy('${sleep}','${tGoal}')">שלח עכשיו</button>
+            </div>` : `
+            <div class="ntfy-status ntfy-info">
+              🔔 תזכורת תישלח אוטומטית ב-${sleep} לאחר תיעוד הקימה
+            </div>`}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">רצף הצלחות</div>
+        <div class="streak-row">
+          <div class="streak-num">${streak}</div>
+          <div class="streak-icon">${streakIcon(streak)}</div>
+          <div>
+            <div class="streak-label">${streakLabel(streak)}</div>
+            <div class="streak-sub">ימים רצופים שעמדת ביעד</div>
+          </div>
+        </div>
+        <div class="cheer">${cheer}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">התקדמות לעבר 4:30</div>
+        ${progressHtml}
+      </div>
+
+      <div class="card">
+        <div class="card-title">7 ימים אחרונים</div>
+        ${history.map(r=>`
+          <div class="hist-row">
+            <span class="hist-date">${fmtDate(r.date)}</span>
+            <div style="text-align:center">
+              <div class="hist-time">${r.log?r.log.wakeTime:'—'}</div>
+              <div class="hist-goal">יעד: ${r.goal}</div>
+            </div>
+            <span class="hist-status">${r.status}</span>
+          </div>`).join('')}
+      </div>
+
+      <div class="reset-row">
+        <button class="reset-btn" onclick="resetApp()">אפס את כל הנתונים</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "קום מוקדם",
+  "short_name": "קום מוקדם",
+  "description": "קום מוקדם יותר בהדרגה — 15 דקות כל 3 ימים עד 4:30",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FF6B35",
+  "theme_color": "#FF6B35",
+  "dir": "rtl",
+  "lang": "he",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
