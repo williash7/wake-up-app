@@ -420,12 +420,12 @@ async function sendNtfy(state, sleep, tGoal) {
     return { skipped: true };
   }
 
-  // חשב עיכוב יחסי בשניות עד שעת השינה הלילה
+  // חשב Unix timestamp מוחלט לשעת השינה הלילה
   const [h,m]=sleep.split(':').map(Number);
   const target=new Date();
   target.setHours(h,m,0,0);
   if (target.getTime()<=Date.now()) target.setDate(target.getDate()+1);
-  const delaySecs=Math.floor((target.getTime()-Date.now())/1000);
+  const atTs=Math.floor(target.getTime()/1000);
 
   // חשב יעד קימה למחר לגוף ההודעה
   const tmrw=new Date(today()+'T12:00:00');
@@ -440,7 +440,7 @@ async function sendNtfy(state, sleep, tGoal) {
         topic: NTFY_TOPIC,
         title: 'לך לישון! 🌙',
         message: `הגיע הזמן ללכת לישון כדי לקום מחר ב-${tmrwGoal} ✨`,
-        delay: String(delaySecs),
+        delay: String(atTs),
         priority: 4,
         tags: ['sleeping','moon'],
       }),
