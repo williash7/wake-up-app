@@ -489,6 +489,18 @@ function editToday() {
   render();
 }
 
+function clearLogs() {
+  if (!confirm('למחוק את כל היסטוריית הקימה?\n(ההגדרות שלך ישמרו — רק הלוגים יימחקו)')) return;
+  const state = load();
+  if (!state) return;
+  state.logs = [];
+  delete state.lastNtfy;
+  save(state);
+  saveToSheets(state);
+  toast('✅ היסטוריה נמחקה מהמכשיר ומגיליון Sheets');
+  render();
+}
+
 function resetApp() {
   if (confirm('למחוק את כל הנתונים ולהתחיל מחדש?')) {
     localStorage.removeItem(KEY);
@@ -713,7 +725,8 @@ function renderMain() {
       </div>
 
       <div class="reset-row">
-        <button class="reset-btn" onclick="resetApp()">אפס את כל הנתונים</button>
+        <button class="reset-btn" onclick="clearLogs()" style="color:#E53E3E">מחק היסטוריית קימה</button>
+        <button class="reset-btn" onclick="resetApp()">אפס הכל</button>
       </div>
     </div>
   </div>`;
