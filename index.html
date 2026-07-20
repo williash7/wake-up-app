@@ -741,21 +741,32 @@ async function init() {
   // Sheets מכיל נתונים — נרמל והמזג עם נתונים מקומיים
   const remote = normalizeRemote(result.data, local);
 
-  // בדוק שהנרמול הצליח (startGoal חייב להיות תקין)
-  if (!remote.startGoal || !remote.startDate) return;
-
   if (!local) {
-    save(remote);
-  } else {
-    const merged = {
-      ...local,
-      startDate: remote.startDate || local.startDate,
-      startGoal: remote.startGoal || local.startGoal,
-      logs: mergeLogs(local.logs, remote.logs),
-    };
-    save(merged);
+    // אין נתונים מקומיים בכלל — שחזר מ-Sheets (אם הנרמול הצליח)
+    if (remote.startGoal && remote.startDate) {
+      save(remote);
+      render();
+    }
+    return;
   }
-  render(); // רנדר מחדש עם נתונים מסונכרנים
+
+  // שניהם קיימים:
+  // Config (startDate, startGoal) — המכשיר המקומי גובר (הוגדר על ידי המשתמש)
+  // Logs — מיזוג, local גובר על conflict לפי תאריך
+  const merged = {
+    ...local,
+    startDate: local.startDate || remote.startDate,
+    startGoal: local.startGoal || remote.startGoal,
+    logs: mergeLogs(remote.logs, local.logs), // local אחרון = גובר
+  };
+  save(merged);
+
+  // אם ה-config ב-Sheets שונה מהמקומי — תקן את Sheets
+  if (remote.startGoal !== merged.startGoal || remote.startDate !== merged.startDate) {
+    saveToSheets(merged);
+  }
+
+  render();
 }
 
 init();
