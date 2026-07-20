@@ -289,6 +289,37 @@ const dateMs = d => new Date(d+'T12:00:00').getTime();
 const daysDiff = (a,b) => Math.round((dateMs(b)-dateMs(a))/86400000);
 const isEvening = () => { const h=new Date().getHours(); return h>=18||h<2; };
 
+// ממיר ערך שעה מ-Sheets (ISO כגון "1899-12-30T06:09:00.000Z" או "HH:MM") ל-"HH:MM"
+// משתמש ב-UTC כי Apps Script מסדר שעות כ-UTC ישירות
+function parseTimeVal(v, fallback) {
+  if (!v && v !== 0) return fallback || null;
+  const s = String(v);
+  if (/^\d{1,2}:\d{2}$/.test(s)) return s.length === 4 ? '0'+s : s;
+  if (s.includes('T')) {
+    try {
+      const d = new Date(s);
+      if (isNaN(d)) return fallback || null;
+      return `${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}`;
+    } catch(e) { return fallback || null; }
+  }
+  return fallback || null;
+}
+
+// ממיר ערך תאריך מ-Sheets (ISO או "YYYY-MM-DD") ל-"YYYY-MM-DD"
+function parseDateVal(v, fallback) {
+  if (!v) return fallback || null;
+  const s = String(v);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (s.includes('T')) {
+    try {
+      const d = new Date(s);
+      if (isNaN(d)) return fallback || null;
+      return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+    } catch(e) { return fallback || null; }
+  }
+  return fallback || null;
+}
+
 const fmtDate = d => {
   try { return new Date(d+'T12:00:00').toLocaleDateString('he-IL',{weekday:'short',day:'numeric',month:'short'}); }
   catch { return d; }
@@ -382,6 +413,20 @@ function saveToSheets(state) {
     method: 'POST',
     body: JSON.stringify({ startDate: state.startDate, startGoal: state.startGoal, logs: state.logs || [] }),
   }).catch(() => {});
+}
+
+// מנרמל נתונים גולמיים מ-Sheets: ממיר שעות ותאריכים לפורמט תקין
+function normalizeRemote(raw, local) {
+  const startGoal = parseTimeVal(raw.startGoal, local && local.startGoal);
+  const startDate = parseDateVal(raw.startDate, local && local.startDate);
+  const logs = (raw.logs || [])
+    .map(l => {
+      const date = parseDateVal(l.date);
+      const wakeTime = parseTimeVal(l.wakeTime);
+      return date && wakeTime ? { date, wakeTime } : null;
+    })
+    .filter(Boolean);
+  return { startDate, startGoal, logs };
 }
 
 // ממזג שתי רשימות לוגים — מנצח לפי תאריך, remote גובר על conflict
@@ -693,13 +738,15 @@ async function init() {
     return;
   }
 
-  // Sheets מכיל נתונים — מזג עם נתונים מקומיים
-  const remote = result.data;
+  // Sheets מכיל נתונים — נרמל והמזג עם נתונים מקומיים
+  const remote = normalizeRemote(result.data, local);
+
+  // בדוק שהנרמול הצליח (startGoal חייב להיות תקין)
+  if (!remote.startGoal || !remote.startDate) return;
+
   if (!local) {
-    // אין נתונים מקומיים — שחזר מ-Sheets
-    save({ startDate: remote.startDate, startGoal: remote.startGoal, logs: remote.logs || [] });
+    save(remote);
   } else {
-    // שניהם קיימים — מזג לוגים, Sheets גובר על conflict
     const merged = {
       ...local,
       startDate: remote.startDate || local.startDate,
