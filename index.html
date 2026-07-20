@@ -762,10 +762,12 @@ async function init() {
   };
   save(merged);
 
-  // אם Sheets מכיל config שגוי — תקן אותו
-  if (remote.startGoal !== merged.startGoal || remote.startDate !== merged.startDate) {
-    saveToSheets(merged);
-  }
+  // אם Sheets מכיל config שגוי או יותר לוגים מהמקומי — דרוס עם הנכון
+  const sheetsHasBadData =
+    remote.startGoal !== merged.startGoal ||
+    remote.startDate !== merged.startDate ||
+    (remote.logs || []).length !== merged.logs.length;
+  if (sheetsHasBadData) saveToSheets(merged);
 
   render();
 }
